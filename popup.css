@@ -1,0 +1,75 @@
+/*
+ * Icon design:
+ * Webdesigner Depot: http://www.webdesignerdepot.com
+ */
+
+body {
+  margin: 10px 20px;
+  width: 470px;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #222F2F;
+  font-size: 14px;
+  background-color: lightYellow;
+}
+
+input {
+  border: 1px solid white;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.1), 0 0 8px rgba(0,0,0,0.1); 
+  padding: 5px;
+  background: rgba(255,255,255,0.5);
+  margin: 0 0 5px 0;
+}
+
+.entry_form label {
+  font-size: 16px;
+  display: block;
+  margin-bottom: 7px;
+}
+
+.entry_form .project {
+  width: 100px;
+}
+
+.entry_form .task {
+  width: 100px;
+}
+
+.entry_form .description {
+  width: 100px;
+}
+
+.entry_form .time {
+  width: 100px;
+}
+
+.entry_form small {
+  color: #666;
+}
+
+.entry_form .submit {
+  visibility: hidden;  
+}
+
+.settings_link {
+  color: #222F2F;
+  float: right;
+  font-size: 12px;
+}
+
+.clear {
+  clear: both;
+}
+
+.settings_form {
+  display: none;
+  padding-top: 15px;
+  font-size: 13px;
+}
+
+.settings_form label.token {
+  margin-left: 5px;
+}
+
+.settings_form input#token {
+  margin-right: 10px;
+}
