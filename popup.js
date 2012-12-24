@@ -1,19 +1,24 @@
 $(function () {
-  var apiUrl = 'http://localhost:3000/extension_api',
-      tokenInput = $('#token'),
+  var apiUrl       = 'http://localhost:3000/extension_api',
+      tokenInput   = $('#token'),
       settingsLink = $('.settings_link'),
       settingsForm = $('.settings_form'),
-      entryForm = $('.entry_form'),
-      project = $('.project', entryForm),
-      task = $('.task', entryForm),
-      description = $('.description', entryForm),
-      time = $('.time', entryForm),
-      entry = {}
+      entryForm    = $('.entry_form'),
+      project      = $('.project', entryForm),
+      task         = $('.task', entryForm),
+      description  = $('.description', entryForm),
+      time         = $('.time', entryForm),
+      errors       = $('.errors'),
+      info         = $('.info'),
+      spinner      = $('.spinner'),
+      entry        = {}
 
   var controllerUrl = function (path) {
     var url = apiUrl + path + '?' +'user_token=' + localStorage.token
     return url
   }
+
+  spinner.hide()
 
   if (localStorage.token)
     tokenInput.val(localStorage.token)
@@ -31,18 +36,38 @@ $(function () {
 
   entryForm.submit(function (e) {
     e.preventDefault()
-    $.post(controllerUrl('/entries'), {task_id: 1}, function (data) {
+
+    errors.empty()
+
+    var params = {
+      task_id: entry.task_id,
+      entry: {
+        description: description.val(),
+        duration_hours: time.val()
+      }
+    }
+
+    spinner.show()
+
+    $.post(controllerUrl('/entries'), params, function (data) {
+      errors.empty()
+      info.html(data)
+
+      setTimeout(function () { info.empty() }, 3000)
+    }).error(function (jqXHR) {
+      errors.html(jqXHR.responseText)
+    }).complete(function () {
+      spinner.hide()
     })
   })
 
   project.autocomplete({
     source: controllerUrl('/projects'),
-    minLength: 3,
+    minLength: 2,
     delay: 500,
     select: function(event, ui) {
       if (ui.item) {
         entry.project_id = ui.item.id
-        entry.project_shortname = ui.item.value
         entry.task_id = undefined
         task.val('')
       }
@@ -59,7 +84,7 @@ $(function () {
         response(data)
       })
     },
-    minLength: 3,
+    minLength: 2,
     delay: 500,
     select: function(event, ui) {
       if (ui.item) {

@@ -75,6 +75,23 @@ input {
   margin-right: 10px;
 }
 
+.spinner {
+  display: inline-block;
+  background-image: url('images/ui-anim_basic_16x16.gif');
+  height: 16px;
+  width: 16px;
+}
+
+.errors {
+  color: red;
+  font-size: 12px;
+}
+
+.info {
+  font-size: 12px;
+  color: #21610B;
+}
+
 .ui-autocomplete {
   max-height: 60px;
   overflow-y: auto;
