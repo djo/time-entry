@@ -11,10 +11,10 @@
   <body>
     <form method="post" class="entry_form">
       <label for="project">Controllr Fast Time Entry</label>
-      <input type="text" name="project_id" class="project" id="project" placeholder='project'>
-      <input type="text" name="task_id" class="task" placeholder='task'>
-      <input type="text" name="entry[description]" class="description" placeholder='description'>
-      <input type="text" name="entry[duration_hours]" class="time" placeholder='hh:mm'>
+      <input type="text" class="project" id="project" placeholder='project'>
+      <input type="text" class="task" placeholder='task'>
+      <input type="text" class="description" placeholder='description'>
+      <input type="text" class="time" placeholder='hh:mm'>
       <small>To create an entry fill in the inputs and hit enter.</small>
       <input type="submit" value="Save" class="submit">
     </form>
@@ -22,8 +22,6 @@
     <a href="#settings" class="settings_link">settings</a>
     <div class="clear"></div>
     <form class="settings_form">
-      <label for="host">Host:</label>
-      <input type="text" name="host" id="host" placeholder='https://controlling-example.com'>
       <label for="token" class="token">API token:</label>
       <input type="text" name="token" id="token" placeholder='token'>
       <input type="submit" value="Update">
