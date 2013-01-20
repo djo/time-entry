@@ -1,10 +1,9 @@
 $(function () {
   var app = {
-    apiUrl:   'http://localhost:3000/extension_api',
-    errors:   $('.errors'),
-    info:     $('.info'),
-    spinner:  $('.spinner'),
-    newEntry: {}
+    apiUrl:  'http://localhost:3000/extension_api',
+    errors:  $('.errors'),
+    info:    $('.info'),
+    spinner: $('.spinner')
   }
 
   var entryForm = {
@@ -26,10 +25,13 @@ $(function () {
     return url
   }
 
-  app.spinner.hide()
+  settingsForm.token.val(localStorage.token)
 
-  if (localStorage.token)
-    settingsForm.token.val(localStorage.token)
+  entryForm.project.val(localStorage.entryProjectName)
+  entryForm.task.val(localStorage.entryTaskName)
+  entryForm.description.val(localStorage.entryDescription)
+
+  app.spinner.hide()
 
   settingsForm.self.submit(function (e) {
     e.preventDefault()
@@ -42,22 +44,33 @@ $(function () {
     settingsForm.self.toggle()
   })
 
+  entryForm.description[0].addEventListener('input', function () {
+    localStorage.entryDescription = this.value
+  }, false)
+
   entryForm.self.submit(function (e) {
     e.preventDefault()
 
-    app.errors.empty()
-
     var params = {
-      task_id: app.newEntry.task_id,
+      task_id: localStorage.entryTaskId,
       entry: {
-        description: entryForm.description.val(),
+        description: localStorage.entryDescription,
         duration_hours: entryForm.time.val()
       }
     }
 
+    app.errors.empty()
     app.spinner.show()
 
     $.post(controllerUrl('/entries'), params, function (data) {
+      localStorage.entryDescription = ''
+      localStorage.entryProjectName = ''
+      localStorage.entryProjectId = ''
+      localStorage.entryTaskName = ''
+      localStorage.entryTaskId = ''
+
+      $('input:visible', entryForm.self).val('')
+
       app.errors.empty()
       app.info.html(data)
 
@@ -75,8 +88,10 @@ $(function () {
     delay: 500,
     select: function(event, ui) {
       if (ui.item) {
-        app.newEntry.project_id = ui.item.id
-        app.newEntry.task_id = undefined
+        localStorage.entryProjectId = ui.item.id
+        localStorage.entryProjectName = entryForm.project.val()
+        localStorage.entryTaskId = ''
+        localStorage.entryTaskName = ''
         entryForm.task.val('')
       }
     }
@@ -86,7 +101,7 @@ $(function () {
     source: function(request, response) {
       var params = {
         term: request.term,
-        project_id: app.newEntry.project_id
+        project_id: localStorage.entryProjectId
       }
       $.get(controllerUrl('/tasks'), params, function(data) {
         response(data)
@@ -96,7 +111,8 @@ $(function () {
     delay: 500,
     select: function(event, ui) {
       if (ui.item) {
-        app.newEntry.task_id = ui.item.id
+        localStorage.entryTaskId = ui.item.id
+        localStorage.entryTaskName = entryForm.task.val()
       }
     }
   })
