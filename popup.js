@@ -1,84 +1,92 @@
 $(function () {
-  var apiUrl       = 'http://localhost:3000/extension_api',
-      tokenInput   = $('#token'),
-      settingsLink = $('.settings_link'),
-      settingsForm = $('.settings_form'),
-      entryForm    = $('.entry_form'),
-      project      = $('.project', entryForm),
-      task         = $('.task', entryForm),
-      description  = $('.description', entryForm),
-      time         = $('.time', entryForm),
-      errors       = $('.errors'),
-      info         = $('.info'),
-      spinner      = $('.spinner'),
-      entry        = {}
+  var app = {
+    apiUrl:   'http://localhost:3000/extension_api',
+    errors:   $('.errors'),
+    info:     $('.info'),
+    spinner:  $('.spinner'),
+    newEntry: {}
+  }
+
+  var entryForm = {
+    self:        $('.entry_form'),
+    project:     $('input.project'),
+    task:        $('input.task'),
+    description: $('input.description'),
+    time:        $('input.time')
+  }
+
+  var settingsForm = {
+    self:       $('.settings_form'),
+    toggleLink: $('a.settings_link'),
+    token:      $('input.token')
+  }
 
   var controllerUrl = function (path) {
-    var url = apiUrl + path + '?' +'user_token=' + localStorage.token
+    var url = app.apiUrl + path + '?' +'user_token=' + localStorage.token
     return url
   }
 
-  spinner.hide()
+  app.spinner.hide()
 
   if (localStorage.token)
-    tokenInput.val(localStorage.token)
+    settingsForm.token.val(localStorage.token)
 
-  settingsForm.submit(function (e) {
+  settingsForm.self.submit(function (e) {
     e.preventDefault()
-    localStorage.token = tokenInput.val()
-    settingsForm.toggle()
+    localStorage.token = settingsForm.token.val()
+    settingsForm.self.toggle()
   })
 
-  settingsLink.click(function (e) {
+  settingsForm.toggleLink.click(function (e) {
     e.preventDefault()
-    settingsForm.toggle()
+    settingsForm.self.toggle()
   })
 
-  entryForm.submit(function (e) {
+  entryForm.self.submit(function (e) {
     e.preventDefault()
 
-    errors.empty()
+    app.errors.empty()
 
     var params = {
-      task_id: entry.task_id,
+      task_id: app.newEntry.task_id,
       entry: {
-        description: description.val(),
-        duration_hours: time.val()
+        description: entryForm.description.val(),
+        duration_hours: entryForm.time.val()
       }
     }
 
-    spinner.show()
+    app.spinner.show()
 
     $.post(controllerUrl('/entries'), params, function (data) {
-      errors.empty()
-      info.html(data)
+      app.errors.empty()
+      app.info.html(data)
 
-      setTimeout(function () { info.empty() }, 3000)
+      setTimeout(function () { app.info.empty() }, 3000)
     }).error(function (jqXHR) {
-      errors.html(jqXHR.responseText)
+      app.errors.html(jqXHR.responseText)
     }).complete(function () {
-      spinner.hide()
+      app.spinner.hide()
     })
   })
 
-  project.autocomplete({
+  entryForm.project.autocomplete({
     source: controllerUrl('/projects'),
     minLength: 2,
     delay: 500,
     select: function(event, ui) {
       if (ui.item) {
-        entry.project_id = ui.item.id
-        entry.task_id = undefined
-        task.val('')
+        app.newEntry.project_id = ui.item.id
+        app.newEntry.task_id = undefined
+        entryForm.task.val('')
       }
     }
   })
 
-  task.autocomplete({
+  entryForm.task.autocomplete({
     source: function(request, response) {
       var params = {
         term: request.term,
-        project_id: entry.project_id
+        project_id: app.newEntry.project_id
       }
       $.get(controllerUrl('/tasks'), params, function(data) {
         response(data)
@@ -88,7 +96,7 @@ $(function () {
     delay: 500,
     select: function(event, ui) {
       if (ui.item) {
-        entry.task_id = ui.item.id
+        app.newEntry.task_id = ui.item.id
       }
     }
   })

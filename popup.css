@@ -71,7 +71,7 @@ input {
   margin-left: 5px;
 }
 
-.settings_form input#token {
+.settings_form input.token {
   margin-right: 10px;
 }
 
