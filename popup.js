@@ -3,7 +3,15 @@ $(function () {
     apiUrl:  'http://localhost:3000/extension_api',
     errors:  $('.errors'),
     info:    $('.info'),
-    spinner: $('.spinner')
+    spinner: $('.spinner'),
+    timer:   undefined
+  }
+
+  var buttons = {
+    stop: $('a.stop'),
+    play: $('a.play'),
+    pause: $('a.pause'),
+    resume: $('a.resume')
   }
 
   var entryForm = {
@@ -20,42 +28,65 @@ $(function () {
     token:      $('input.token')
   }
 
+  var displayDuration = function (ms) {
+    var secNumber = ms * 0.001,
+        hours = Math.floor(secNumber/ 3600),
+        minutes = Math.floor((secNumber - (hours * 3600)) / 60),
+        seconds = Math.floor(secNumber - (hours * 3600) - (minutes * 60))
+
+    if (hours < 10) { hours = "0" + hours }
+    if (minutes < 10) { minutes = "0" + minutes }
+    if (seconds < 10) { seconds = "0" + seconds }
+
+    var duration = hours + ':' + minutes + ':' + seconds
+    entryForm.time.val(duration)
+  }
+
+  var pausedDuration = function () {
+    return parseInt(localStorage.pausedTime) - parseInt(localStorage.startedTime)
+  }
+
+  var startTimer = function () {
+    app.timer = setInterval(function () {
+      displayDuration((new Date()).getTime() - parseInt(localStorage.startedTime))
+    }, 1000)
+  }
+
   var controllerUrl = function (path) {
     var url = app.apiUrl + path + '?' +'user_token=' + localStorage.token
     return url
   }
 
-  settingsForm.token.val(localStorage.token)
-
-  entryForm.project.val(localStorage.entryProjectName)
-  entryForm.task.val(localStorage.entryTaskName)
-  entryForm.description.val(localStorage.entryDescription)
-
-  app.spinner.hide()
-
-  settingsForm.self.submit(function (e) {
+  var saveToken = function (e) {
     e.preventDefault()
     localStorage.token = settingsForm.token.val()
     settingsForm.self.toggle()
-  })
+  }
 
-  settingsForm.toggleLink.click(function (e) {
+  var toggleSettingsForm = function (e) {
     e.preventDefault()
     settingsForm.self.toggle()
-  })
+  }
 
   entryForm.description[0].addEventListener('input', function () {
     localStorage.entryDescription = this.value
   }, false)
 
-  entryForm.self.submit(function (e) {
+  var saveEntry = function (e) {
     e.preventDefault()
 
+    if ($.inArray(localStorage.state, ['stopped', 'paused']) === -1) {
+      app.errors.html('First pause the timer')
+      setTimeout(function () { app.errors.empty() }, 3000)
+      return
+    }
+
+    var durationWithoutSecs = (entryForm.time.val().match(/(\d+):(\d+)/) || [])[0]
     var params = {
       task_id: localStorage.entryTaskId,
       entry: {
         description: localStorage.entryDescription,
-        duration_hours: entryForm.time.val()
+        duration_hours: durationWithoutSecs
       }
     }
 
@@ -68,19 +99,71 @@ $(function () {
       localStorage.entryProjectId = ''
       localStorage.entryTaskName = ''
       localStorage.entryTaskId = ''
+      localStorage.state = 'stopped'
 
       $('input:visible', entryForm.self).val('')
+      chrome.browserAction.setIcon({ path: 'images/stopwatch.png' })
+      buttons.resume.hide()
+      buttons.play.show()
 
       app.errors.empty()
       app.info.html(data)
 
       setTimeout(function () { app.info.empty() }, 3000)
     }).error(function (jqXHR) {
-      app.errors.html(jqXHR.responseText)
+      app.errors.html(jqXHR.responseText || 'Something went wrong, please check out your token')
     }).complete(function () {
       app.spinner.hide()
     })
-  })
+  }
+
+  var stop = function (e) {
+    e.preventDefault()
+
+    clearInterval(app.timer)
+    localStorage.state = 'stopped'
+    entryForm.time.val('')
+    buttons.pause.hide()
+    buttons.resume.hide()
+    buttons.play.css('display', 'inline-block')
+    chrome.browserAction.setIcon({ path: 'images/stopwatch.png' })
+  }
+
+  var play = function (e) {
+    e.preventDefault()
+
+    buttons.play.hide()
+    buttons.pause.css('display', 'inline-block')
+    chrome.browserAction.setIcon({ path: 'images/playwatch.png' })
+
+    localStorage.state = 'playing'
+    localStorage.startedTime = new Date().getTime()
+    startTimer()
+  }
+
+  var pause = function (e) {
+    e.preventDefault()
+
+    buttons.pause.hide()
+    buttons.resume.css('display', 'inline-block')
+    chrome.browserAction.setIcon({ path: 'images/pausewatch.png' })
+
+    localStorage.state = 'paused'
+    localStorage.pausedTime = new Date().getTime()
+    clearInterval(app.timer)
+  }
+
+  var resume = function (e) {
+    e.preventDefault()
+
+    buttons.resume.hide()
+    buttons.pause.css('display', 'inline-block')
+    chrome.browserAction.setIcon({ path: 'images/playwatch.png' })
+
+    localStorage.state = 'playing'
+    localStorage.startedTime = (new Date()).getTime() - pausedDuration()
+    startTimer()
+  }
 
   entryForm.project.autocomplete({
     source: controllerUrl('/projects'),
@@ -116,4 +199,41 @@ $(function () {
       }
     }
   })
+
+  // Bind events
+  settingsForm.self.submit(saveToken)
+  settingsForm.toggleLink.click(toggleSettingsForm)
+  entryForm.self.submit(saveEntry)
+  buttons.stop.click(stop)
+  buttons.play.click(play)
+  buttons.pause.click(pause)
+  buttons.resume.click(resume)
+
+  // Set default states
+  if (!localStorage.state) localStorage.state = 'stopped'
+  app.apiLink.html(app.apiUrl + '/entries')
+  app.spinner.hide()
+
+  // Prefill forms
+  settingsForm.token.val(localStorage.token)
+  entryForm.project.val(localStorage.entryProjectName)
+  entryForm.task.val(localStorage.entryTaskName)
+  entryForm.description.val(localStorage.entryDescription)
+
+  switch(localStorage.state) {
+    case 'stopped':
+      buttons.play.css('display', 'inline-block')
+      chrome.browserAction.setIcon({ path: 'images/stopwatch.png' })
+      break
+    case 'playing':
+      buttons.pause.css('display', 'inline-block')
+      chrome.browserAction.setIcon({ path: 'images/playwatch.png' })
+      startTimer()
+      break
+    case 'paused':
+      buttons.resume.css('display', 'inline-block')
+      chrome.browserAction.setIcon({ path: 'images/pausewatch.png' })
+      displayDuration(pausedDuration())
+      break
+  }
 })

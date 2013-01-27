@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "description": "Quick creation of the controller time entries.",
   "browser_action": {
-    "default_icon": "icon.png",
+    "default_icon": "images/stopwatch.png",
     "default_popup": "popup.html"
   },
   "content_security_policy": "script-src 'self' http://localhost:3000; object-src 'self'"
