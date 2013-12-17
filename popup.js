@@ -1,10 +1,6 @@
 $(function () {
   var $app = {
-    apiUrl:  'http://localhost:3000/extension_api',
-    errors:  $('.errors'),
-    info:    $('.info'),
-    spinner: $('.spinner'),
-    timer:   undefined
+    timer: undefined
   };
 
   var $buttons = {
@@ -15,17 +11,9 @@ $(function () {
   };
 
   var $entryForm = {
-    self:        $('.entry_form'),
-    project:     $('input.project'),
-    task:        $('input.task'),
+    self:        $('.entry-form'),
     description: $('input.description'),
     time:        $('input.time')
-  };
-
-  var $settingsForm = {
-    self:       $('.settings_form'),
-    toggleLink: $('a.settings_link'),
-    token:      $('input.token')
   };
 
   function displayDuration(ms) {
@@ -52,22 +40,6 @@ $(function () {
     }, 1000);
   };
 
-  function controllerUrl(path) {
-    var url = $app.apiUrl + path + '?' +'user_token=' + localStorage.token;
-    return url;
-  };
-
-  function saveToken(e) {
-    e.preventDefault();
-    localStorage.token = $settingsForm.token.val();
-    $settingsForm.self.toggle();
-  };
-
-  function toggleSettingsForm(e) {
-    e.preventDefault();
-    $settingsForm.self.toggle();
-  };
-
   $entryForm.description[0].addEventListener('input', function () {
     localStorage.entryDescription = this.value;
   }, false);
@@ -76,45 +48,21 @@ $(function () {
     e.preventDefault();
 
     if ($.inArray(localStorage.state, ['stopped', 'paused']) === -1) {
-      $app.errors.html('First pause the timer');
-      setTimeout(function () { $app.errors.empty() }, 3000);
+      console.log('First pause the timer')
       return;
     };
 
     var durationWithoutSecs = ($entryForm.time.val().match(/(\d+):(\d+)/) || [])[0];
-    var params = {
-      task_id: localStorage.entryTaskId,
-      entry: {
-        description: localStorage.entryDescription,
-        duration_hours: durationWithoutSecs
-      }
-    };
 
-    $app.errors.empty();
-    $app.spinner.show();
+    console.log(localStorage.entryDescription + ": " + durationWithoutSecs)
 
-    $.post(controllerUrl('/entries'), params, function (data) {
-      localStorage.entryDescription = '';
-      localStorage.entryProjectName = '';
-      localStorage.entryProjectId = '';
-      localStorage.entryTaskName = '';
-      localStorage.entryTaskId = '';
-      localStorage.state = 'stopped';
+    localStorage.entryDescription = '';
+    localStorage.state = 'stopped';
 
-      $('input:visible', $entryForm.self).val('');
-      chrome.browserAction.setIcon({ path: 'images/stopwatch.png' });
-      $buttons.resume.hide();
-      $buttons.play.show();
-
-      $app.errors.empty();
-      $app.info.html(data);
-
-      setTimeout(function () { $app.info.empty() }, 3000);
-    }).error(function (jqXHR) {
-      $app.errors.html(jqXHR.responseText || 'Something went wrong, please check out your token');
-    }).complete(function () {
-      $app.spinner.hide();
-    });
+    $('input:visible', $entryForm.self).val('');
+    chrome.browserAction.setIcon({ path: 'images/stopwatch.png' });
+    $buttons.resume.hide();
+    $buttons.play.show();
   };
 
   function stop(e) {
@@ -165,42 +113,7 @@ $(function () {
     startTimer();
   }
 
-  $entryForm.project.autocomplete({
-    source: controllerUrl('/projects'),
-    minLength: 2,
-    delay: 500,
-    select: function(event, ui) {
-      if (!ui.item) return;
-      localStorage.entryProjectId = ui.item.id;
-      localStorage.entryProjectName = $entryForm.project.val();
-      localStorage.entryTaskId = '';
-      localStorage.entryTaskName = '';
-      $entryForm.task.val('');
-    }
-  });
-
-  $entryForm.task.autocomplete({
-    source: function(request, response) {
-      var params = {
-        term: request.term,
-        project_id: localStorage.entryProjectId
-      };
-      $.get(controllerUrl('/tasks'), params, function(data) {
-        response(data)
-      });
-    },
-    minLength: 2,
-    delay: 500,
-    select: function(event, ui) {
-      if (!ui.item) return;
-      localStorage.entryTaskId = ui.item.id;
-      localStorage.entryTaskName = $entryForm.task.val();
-    }
-  });
-
   // Bind events
-  $settingsForm.self.submit(saveToken);
-  $settingsForm.toggleLink.click(toggleSettingsForm);
   $entryForm.self.submit(saveEntry);
   $buttons.stop.click(stop);
   $buttons.play.click(play);
@@ -209,12 +122,8 @@ $(function () {
 
   // Set default states
   if (!localStorage.state) localStorage.state = 'stopped';
-  $app.spinner.hide();
 
   // Prefill forms
-  $settingsForm.token.val(localStorage.token);
-  $entryForm.project.val(localStorage.entryProjectName);
-  $entryForm.task.val(localStorage.entryTaskName);
   $entryForm.description.val(localStorage.entryDescription);
 
   switch(localStorage.state) {

@@ -1,11 +1,11 @@
 {
-  "name": "Controllr Fast Time Entry",
+  "name": "Time Entry",
   "version": "0.1",
   "manifest_version": 2,
-  "description": "Quick creation of the controller time entries.",
+  "description": "Time tracking software.",
   "browser_action": {
     "default_icon": "images/stopwatch.png",
     "default_popup": "popup.html"
   },
-  "content_security_policy": "script-src 'self' http://localhost:3000; object-src 'self'"
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }

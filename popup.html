@@ -1,38 +1,20 @@
 <!doctype html>
 <html>
   <head>
-    <title>Controllr Fast Time Entry</title>
-    <link href="jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
+    <title>Time Entry</title>
     <link href="popup.css" rel="stylesheet">
     <script src="jquery-1.8.3.min.js"></script>
-    <script src="jquery-ui-1.9.2.custom.min.js"></script>
     <script src="popup.js"></script>
   </head>
   <body>
-    <form method="post" class="entry_form">
-      <label for="project">Controllr Fast Time Entry</label>
-      <input type="text" class="project" id="project" placeholder='project'>
-      <input type="text" class="task" placeholder='task'>
+    <form method="post" class="entry-form">
       <input type="text" class="description" placeholder='description'>
       <input type="text" class="time" placeholder='hh:mm'>
       <a href="#stop" title="Stop" class="stop"></a>
       <a href="#play" title="Play" class="button play"></a>
       <a href="#pause" title="Pause" class="button pause"></a>
       <a href="#resume" title="Resume" class="button resume"></a>
-      <small>To create an entry fill in the inputs and hit enter.</small>
-      <input type="submit" value="Save" class="submit">
-    </form>
-
-    <span class="spinner"></span>
-    <span class="errors"></span>
-    <span class="info"></span>
-
-    <a href="#settings" class="settings_link">settings</a>
-    <div class="clear"></div>
-    <form class="settings_form">
-      <label for="token" class="token">API token:</label>
-      <input type="password" name="token" id="token" class="token" placeholder='token'>
-      <input type="submit" value="Update">
+      <input type="submit" class="submit">
     </form>
   </body>
 </html>

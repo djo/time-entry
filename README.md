@@ -1,12 +1,12 @@
-Chrome extension for quick creation of time entries.
+## Time Tracking Software
 
-## Development
+Development:
 
-* Open "Settings/Extenstions" tab in the chrome
-* Load unpacked extension (the project folder)
-* Check "Developer mode"
+* Open "Settings/Extenstions" tab in the chrome.
+* Load unpacked extension (the project folder).
+* Check "Developer mode".
 
-## Packing
+Packing:
 
-* Prepare the folder coping the project without files READMY.md, .git, .gitignore, /doc
-* Use pack extension link in the "Settings/Extenstions" tab
+* Prepare the folder coping the project without files READMY.md, .git, .gitignore, /doc.
+* Use pack extension link in the "Settings/Extenstions" tab.

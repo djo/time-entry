@@ -20,41 +20,29 @@ a {
   color: #222F2F;
 }
 
-.entry_form {
+.entry-form {
   position: relative;
 }
 
-.entry_form label {
+.entry-form label {
   font-size: 16px;
   display: block;
   margin-bottom: 7px;
 }
 
-.entry_form .project {
+.entry-form .description {
   width: 100px;
 }
 
-.entry_form .task {
+.entry-form .time {
   width: 100px;
 }
 
-.entry_form .description {
-  width: 100px;
-}
-
-.entry_form .time {
-  width: 100px;
-}
-
-.entry_form small {
-  color: #666;
-}
-
-.entry_form .submit {
+.entry-form .submit {
   visibility: hidden;  
 }
 
-.entry_form .stop {
+.entry-form .stop {
   display: inline-block;
   background-image: url(images/stop.png);
   background-repeat: no-repeat;
@@ -65,7 +53,7 @@ a {
   right: 35px;
 }
 
-.entry_form .button {
+.entry-form .button {
   display: none;
   margin-left: 10px;
   background-repeat: no-repeat;
@@ -73,71 +61,18 @@ a {
   vertical-align: text-top;
 }
 
-.entry_form .button.resume {
+.entry-form .button.resume {
   width: 16px;
   background-image: url('images/resume.png');
 }
 
-.entry_form .button.play {
+.entry-form .button.play {
   width: 16px;
   background-image: url('images/play.png');
 }
 
-.entry_form .button.pause {
+.entry-form .button.pause {
   margin-left: 14px;
   width: 10px;
   background-image: url('images/pause.png');
-}
-
-.settings_link {
-  color: #222F2F;
-  float: right;
-  font-size: 12px;
-}
-
-.clear {
-  clear: both;
-}
-
-.settings_form {
-  display: none;
-  margin-top: 15px;
-  font-size: 13px;
-}
-
-.settings_form label.token {
-  margin-left: 5px;
-}
-
-.settings_form input.token {
-  margin-right: 10px;
-}
-
-.spinner {
-  display: inline-block;
-  background-image: url('images/ui-anim_basic_16x16.gif');
-  height: 16px;
-  width: 16px;
-}
-
-.errors {
-  color: red;
-  font-size: 12px;
-}
-
-.info {
-  font-size: 12px;
-  color: #339900;
-}
-
-.ui-autocomplete {
-  max-height: 60px;
-  overflow-y: auto;
-  /* prevent horizontal scrollbar */
-  overflow-x: hidden;
-  font-size: 10px;
-}
-
-.ui-autocomplete-loading {
-  background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat;
 }
