@@ -8,13 +8,16 @@
   </head>
   <body>
     <form method="post" class="entry-form">
-      <input type="text" class="description" placeholder='description'>
-      <input type="text" class="time" placeholder='hh:mm'>
-      <a href="#stop" title="Stop" class="stop"></a>
+      <input type="text" class="task" placeholder="task">
+      <div class="time-box">
+        <input type="text" class="time" placeholder="hh:mm">
+        <a href="#stop" title="Stop" class="stop"></a>
+      </div>
       <a href="#play" title="Play" class="button play"></a>
       <a href="#pause" title="Pause" class="button pause"></a>
       <a href="#resume" title="Resume" class="button resume"></a>
-      <input type="submit" class="submit">
+      <input type="submit" value="Track">
+      <textarea class="history"></textarea>
     </form>
   </body>
 </html>

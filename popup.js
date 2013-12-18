@@ -1,19 +1,109 @@
 $(function () {
-  var $app = {
-    timer: undefined
-  };
+  var intervalID;
 
   var $buttons = {
-    stop: $('a.stop'),
-    play: $('a.play'),
-    pause: $('a.pause'),
+    stop:   $('a.stop'),
+    play:   $('a.play'),
+    pause:  $('a.pause'),
     resume: $('a.resume')
   };
 
-  var $entryForm = {
-    self:        $('.entry-form'),
-    description: $('input.description'),
-    time:        $('input.time')
+  var $form = {
+    self:    $('.entry-form'),
+    task:    $('input.task'),
+    time:    $('input.time'),
+    history: $('textarea.history')
+  };
+
+  // Restore a previous session
+  if (!localStorage.state) localStorage.state = 'stopped';
+  $form.task.val(localStorage.task);
+  $form.history.val(localStorage.history);
+
+  // Bind events
+  $buttons.play.click(play);
+  $buttons.pause.click(pause);
+  $buttons.stop.click(stop);
+  $buttons.resume.click(resume);
+  $form.self.submit(track);
+  $form.task.change(storeTask);
+  $form.history.change(storeHistory);
+
+  // Init the timer
+  if (localStorage.state === 'stopped') {
+    $buttons.play.css('display', 'inline-block');
+    setBrowserIcon('stopwatch.png');
+  } else if (localStorage.state === 'playing') {
+    $buttons.pause.css('display', 'inline-block');
+    setBrowserIcon('playwatch.png');
+    startTimer();
+  } else if (localStorage.state === 'paused') {
+    $buttons.resume.css('display', 'inline-block');
+    setBrowserIcon('pausewatch.png');
+    displayDuration(pausedDuration());
+  };
+
+  function play(e) {
+    e.preventDefault();
+
+    $buttons.play.hide();
+    $buttons.pause.css('display', 'inline-block');
+    setBrowserIcon('playwatch.png');
+
+    localStorage.state = 'playing';
+    localStorage.startedTime = new Date().getTime();
+    startTimer();
+  };
+
+  function pause(e) {
+    e.preventDefault();
+
+    $buttons.pause.hide();
+    $buttons.resume.css('display', 'inline-block');
+    setBrowserIcon('pausewatch.png');
+
+    localStorage.state = 'paused';
+    localStorage.pausedTime = new Date().getTime();
+    clearInterval(intervalID);
+  };
+
+  function stop(e) {
+    e.preventDefault();
+
+    clearInterval(intervalID);
+    localStorage.state = 'stopped';
+    localStorage.pausedTime = null;
+    localStorage.startedTime = null;
+
+    $form.time.val('');
+    $buttons.pause.hide();
+    $buttons.resume.hide();
+    $buttons.play.css('display', 'inline-block');
+    setBrowserIcon('stopwatch.png');
+  };
+
+  function resume(e) {
+    e.preventDefault();
+
+    $buttons.resume.hide();
+    $buttons.pause.css('display', 'inline-block');
+    setBrowserIcon('playwatch.png');
+
+    localStorage.state = 'playing';
+    localStorage.startedTime = (new Date()).getTime() - pausedDuration();
+    localStorage.pausedTime = null;
+    startTimer();
+  };
+
+  function track(e) {
+    e.preventDefault();
+
+    var time = $form.time.val();
+    if (!time) return;
+
+    var newEntry = time + " - " + $form.task.val();
+    $form.history.val(newEntry + '\n' + $form.history.val());
+    $form.history.trigger('change');
   };
 
   function displayDuration(ms) {
@@ -27,119 +117,30 @@ $(function () {
     if (seconds < 10) seconds = "0" + seconds;
 
     var duration = hours + ':' + minutes + ':' + seconds;
-    $entryForm.time.val(duration);
+    $form.time.val(duration);
+  };
+
+  function startTimer() {
+    intervalID = setInterval(function () {
+      var duration = (new Date()).getTime() - Number(localStorage.startedTime);
+      displayDuration(duration);
+    }, 1000);
   };
 
   function pausedDuration() {
     return Number(localStorage.pausedTime) - Number(localStorage.startedTime);
   };
 
-  function startTimer() {
-    $app.timer = setInterval(function () {
-      displayDuration((new Date()).getTime() - Number(localStorage.startedTime))
-    }, 1000);
+  function storeTask() {
+    localStorage.task = this.value;
   };
 
-  $entryForm.description[0].addEventListener('input', function () {
-    localStorage.entryDescription = this.value;
-  }, false);
-
-  function saveEntry(e) {
-    e.preventDefault();
-
-    if ($.inArray(localStorage.state, ['stopped', 'paused']) === -1) {
-      console.log('First pause the timer')
-      return;
-    };
-
-    var durationWithoutSecs = ($entryForm.time.val().match(/(\d+):(\d+)/) || [])[0];
-
-    console.log(localStorage.entryDescription + ": " + durationWithoutSecs)
-
-    localStorage.entryDescription = '';
-    localStorage.state = 'stopped';
-
-    $('input:visible', $entryForm.self).val('');
-    chrome.browserAction.setIcon({ path: 'images/stopwatch.png' });
-    $buttons.resume.hide();
-    $buttons.play.show();
+  function storeHistory() {
+    localStorage.history = this.value;
   };
 
-  function stop(e) {
-    e.preventDefault();
-
-    clearInterval($app.timer);
-    localStorage.state = 'stopped';
-    $entryForm.time.val('');
-    $buttons.pause.hide();
-    $buttons.resume.hide();
-    $buttons.play.css('display', 'inline-block');
-    chrome.browserAction.setIcon({ path: 'images/stopwatch.png' });
-  };
-
-  function play(e) {
-    e.preventDefault();
-
-    $buttons.play.hide();
-    $buttons.pause.css('display', 'inline-block');
-    chrome.browserAction.setIcon({ path: 'images/playwatch.png' });
-
-    localStorage.state = 'playing';
-    localStorage.startedTime = new Date().getTime();
-    startTimer();
-  }
-
-  function pause(e) {
-    e.preventDefault();
-
-    $buttons.pause.hide();
-    $buttons.resume.css('display', 'inline-block');
-    chrome.browserAction.setIcon({ path: 'images/pausewatch.png' });
-
-    localStorage.state = 'paused';
-    localStorage.pausedTime = new Date().getTime();
-    clearInterval($app.timer);
-  }
-
-  function resume(e) {
-    e.preventDefault();
-
-    $buttons.resume.hide();
-    $buttons.pause.css('display', 'inline-block');
-    chrome.browserAction.setIcon({ path: 'images/playwatch.png' });
-
-    localStorage.state = 'playing';
-    localStorage.startedTime = (new Date()).getTime() - pausedDuration();
-    startTimer();
-  }
-
-  // Bind events
-  $entryForm.self.submit(saveEntry);
-  $buttons.stop.click(stop);
-  $buttons.play.click(play);
-  $buttons.pause.click(pause);
-  $buttons.resume.click(resume);
-
-  // Set default states
-  if (!localStorage.state) localStorage.state = 'stopped';
-
-  // Prefill forms
-  $entryForm.description.val(localStorage.entryDescription);
-
-  switch(localStorage.state) {
-    case 'stopped':
-      $buttons.play.css('display', 'inline-block');
-      chrome.browserAction.setIcon({ path: 'images/stopwatch.png' });
-      break;
-    case 'playing':
-      $buttons.pause.css('display', 'inline-block');
-      chrome.browserAction.setIcon({ path: 'images/playwatch.png' });
-      startTimer();
-      break;
-    case 'paused':
-      $buttons.resume.css('display', 'inline-block');
-      chrome.browserAction.setIcon({ path: 'images/pausewatch.png' });
-      displayDuration(pausedDuration());
-      break;
+  function setBrowserIcon(icon) {
+    var path = 'images/' + icon;
+    chrome.browserAction.setIcon({ path: path });
   };
 });
