@@ -15,12 +15,12 @@ $(function () {
     history: $('textarea.history')
   };
 
-  // Restore a previous session
+  // restore the previous session
   if (!localStorage.state) localStorage.state = 'stopped';
   $form.task.val(localStorage.task);
   $form.history.val(localStorage.history);
 
-  // Bind events
+  // bind events
   $buttons.play.click(play);
   $buttons.pause.click(pause);
   $buttons.stop.click(stop);
@@ -29,7 +29,7 @@ $(function () {
   $form.task.change(storeTask);
   $form.history.change(storeHistory);
 
-  // Init the timer
+  // init the timer
   if (localStorage.state === 'stopped') {
     $buttons.play.css('display', 'inline-block');
     setBrowserIcon('stopwatch.png');
@@ -98,11 +98,22 @@ $(function () {
   function track(e) {
     e.preventDefault();
 
-    var time = $form.time.val();
-    if (!time) return;
+    var value = $form.time.val();
+    if (!value) return;
 
-    var newEntry = time + " - " + $form.task.val();
-    $form.history.val(newEntry + '\n' + $form.history.val());
+    // parse duration string into 1h15m format
+    var time = value.split(':');
+    if (time.length === 2) time.unshift('0');
+    var hours = Number(time[0]),
+        mins  = Number(time[1]),
+        secs  = Number(time[2]);
+    if (secs > 0) mins += 1;
+    var formatted = mins + 'm';
+    if (hours > 0) formatted = hours + 'h' + formatted;
+
+    // put it into the history
+    var entry = formatted + " ~ " + $form.task.val();
+    $form.history.val(entry + '\n' + $form.history.val());
     $form.history.trigger('change');
   };
 
