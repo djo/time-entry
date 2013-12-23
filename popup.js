@@ -1,44 +1,44 @@
-$(function () {
+(function () {
   var intervalID;
 
-  var $buttons = {
-    stop:   $('a.stop'),
-    play:   $('a.play'),
-    pause:  $('a.pause'),
-    resume: $('a.resume')
+  var buttons = {
+    stop:   document.querySelector('a.stop'),
+    play:   document.querySelector('a.play'),
+    pause:  document.querySelector('a.pause'),
+    resume: document.querySelector('a.resume')
   };
 
-  var $form = {
-    self:    $('.entry-form'),
-    task:    $('input.task'),
-    time:    $('input.time'),
-    history: $('textarea.history')
+  var form = {
+    self:    document.querySelector('.entry-form'),
+    task:    document.querySelector('input.task'),
+    time:    document.querySelector('input.time'),
+    history: document.querySelector('textarea.history')
   };
 
   // restore the previous session
   if (!localStorage.state) localStorage.state = 'stopped';
-  $form.task.val(localStorage.task);
-  $form.history.val(localStorage.history);
+  form.task.value = localStorage.task;
+  form.history.value = localStorage.history;
 
   // bind events
-  $buttons.play.click(play);
-  $buttons.pause.click(pause);
-  $buttons.stop.click(stop);
-  $buttons.resume.click(resume);
-  $form.self.submit(track);
-  $form.task.change(storeTask);
-  $form.history.change(storeHistory);
+  buttons.play.addEventListener('click', play);
+  buttons.pause.addEventListener('click', pause);
+  buttons.stop.addEventListener('click', stop);
+  buttons.resume.addEventListener('click', resume);
+  form.self.addEventListener('submit', track);
+  form.task.addEventListener('change', storeTask);
+  form.history.addEventListener('change', storeHistory);
 
   // init the timer
   if (localStorage.state === 'stopped') {
-    $buttons.play.css('display', 'inline-block');
+    display(buttons.play);
     setBrowserIcon('stopwatch.png');
   } else if (localStorage.state === 'playing') {
-    $buttons.pause.css('display', 'inline-block');
+    display(buttons.pause);
     setBrowserIcon('playwatch.png');
     startTimer();
   } else if (localStorage.state === 'paused') {
-    $buttons.resume.css('display', 'inline-block');
+    display(buttons.resume);
     setBrowserIcon('pausewatch.png');
     displayDuration(pausedDuration());
   };
@@ -46,8 +46,8 @@ $(function () {
   function play(e) {
     e.preventDefault();
 
-    $buttons.play.hide();
-    $buttons.pause.css('display', 'inline-block');
+    hide(buttons.play);
+    display(buttons.pause);
     setBrowserIcon('playwatch.png');
 
     localStorage.state = 'playing';
@@ -58,8 +58,8 @@ $(function () {
   function pause(e) {
     e.preventDefault();
 
-    $buttons.pause.hide();
-    $buttons.resume.css('display', 'inline-block');
+    hide(buttons.pause);
+    display(buttons.resume);
     setBrowserIcon('pausewatch.png');
 
     localStorage.state = 'paused';
@@ -75,18 +75,18 @@ $(function () {
     localStorage.pausedTime = null;
     localStorage.startedTime = null;
 
-    $form.time.val('');
-    $buttons.pause.hide();
-    $buttons.resume.hide();
-    $buttons.play.css('display', 'inline-block');
+    form.time.value = '';
+    hide(buttons.pause);
+    hide(buttons.resume);
+    display(buttons.play);
     setBrowserIcon('stopwatch.png');
   };
 
   function resume(e) {
     e.preventDefault();
 
-    $buttons.resume.hide();
-    $buttons.pause.css('display', 'inline-block');
+    hide(buttons.resume);
+    display(buttons.pause);
     setBrowserIcon('playwatch.png');
 
     localStorage.state = 'playing';
@@ -97,12 +97,10 @@ $(function () {
 
   function track(e) {
     e.preventDefault();
-
-    var value = $form.time.val();
-    if (!value) return;
+    if (!form.time.value) return;
 
     // parse duration string into 1h15m format
-    var time = value.split(':');
+    var time = form.time.value.split(':');
     if (time.length === 2) time.unshift('0');
     var hours = Number(time[0]),
         mins  = Number(time[1]),
@@ -112,9 +110,9 @@ $(function () {
     if (hours > 0) formatted = hours + 'h' + formatted;
 
     // put it into the history
-    var entry = formatted + " ~ " + $form.task.val();
-    $form.history.val(entry + '\n' + $form.history.val());
-    $form.history.trigger('change');
+    var entry = formatted + " ~ " + form.task.value;
+    form.history.value = entry + '\n' + form.history.value;
+    storeHistory();
   };
 
   function displayDuration(ms) {
@@ -123,12 +121,11 @@ $(function () {
         minutes = Math.floor((secNumber - (hours * 3600)) / 60),
         seconds = Math.floor(secNumber - (hours * 3600) - (minutes * 60));
 
-    if (hours < 10)   hours = "0" + hours;
+    if (hours < 10)   hours   = "0" + hours;
     if (minutes < 10) minutes = "0" + minutes;
     if (seconds < 10) seconds = "0" + seconds;
 
-    var duration = hours + ':' + minutes + ':' + seconds;
-    $form.time.val(duration);
+    form.time.value = hours + ':' + minutes + ':' + seconds;
   };
 
   function startTimer() {
@@ -143,15 +140,23 @@ $(function () {
   };
 
   function storeTask() {
-    localStorage.task = this.value;
+    localStorage.task = form.task.value;
   };
 
   function storeHistory() {
-    localStorage.history = this.value;
+    localStorage.history = form.history.value;
   };
 
   function setBrowserIcon(icon) {
     var path = 'images/' + icon;
     chrome.browserAction.setIcon({ path: path });
   };
-});
+
+  function display(el) {
+    el.style.display = 'inline-block';
+  }
+
+  function hide(el) {
+    el.style.display = 'none';
+  }
+})();
