@@ -1,12 +1,11 @@
-## Time Tracking Software
+## Time Tracking Extension for Chrome Web Store
+
+coming soon…
 
 Development:
 
 * Open "Settings/Extenstions" tab in the chrome.
 * Load unpacked extension (the project folder).
-* Check "Developer mode".
+* Check "Developer mode" in the browser.
 
-Packing:
-
-* Prepare the folder coping the project without files READMY.md, .git, .gitignore, /doc.
-* Use pack extension link in the "Settings/Extenstions" tab.
+Copyright (C) 2013 [Andrew Djoga](http://andrewdjoga.com), released under the MIT license.
