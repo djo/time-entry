@@ -1,90 +1,88 @@
 body {
-  margin: 20px 25px;
+  margin: 12px 0px 28px 15px;
+  padding: 0;
   width: 300px;
-  height: 115px;
+  height: 170px;
+  background-color: #f9f9f9;
   font-family: Helvetica, Arial, sans-serif;
-  color: #222F2F;
   font-size: 14px;
-  background-color: lightYellow;
 }
 
-input, textarea {
-  border: 1px solid #ccc;
-  padding: 5px;
-  background: rgba(255,255,255,0.5);
-  margin: 0;
-}
-
-input[type=submit] {
-  display: block;
-  margin: 5px 0 10px;
-}
-
-textarea {
-  width: 246px;
-  height: 40px;
-}
-
-a {
-  color: #222F2F;
-}
-
-.entry-form {
+form {
   position: relative;
 }
 
-.entry-form label {
-  font-size: 16px;
-  display: block;
-  margin-bottom: 7px;
+form input, form textarea {
+  padding: 5px;
+  margin: 0;
+  border: 1px solid #ccc;
+  background-color: #fff;
 }
 
-.entry-form .task {
+form textarea {
+  width: 246px;
+  height: 83px;
+}
+
+form .task {
   width: 160px;
 }
 
-.entry-form .time-box {
+form .time-box {
   position: relative;
   display: inline-block;
   width: 70px;
   margin-right: 10px;
 }
 
-.entry-form .time-box .time {
+form .time-box .time {
   width: 100%;
 }
 
-.entry-form .time-box .stop {
-  display: inline-block;
-  background-image: url(images/stop.png);
-  background-repeat: no-repeat;
-  width: 16px;
-  height: 16px;
+form .time-box .stop {
   position: absolute;
   top: 5px;
   right: -8px;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url(images/stop.png);
+  background-repeat: no-repeat;
 }
 
-.entry-form .button {
+form input[type=submit] {
+  display: block;
+  margin: 5px 0;
+  cursor: pointer;
+}
+
+form .button {
   display: none;
   margin-left: 10px;
-  background-repeat: no-repeat;
   height: 18px;
+  background-repeat: no-repeat;
   vertical-align: text-top;
 }
 
-.entry-form .button.resume {
+form .button.resume {
   width: 16px;
   background-image: url('images/resume.png');
 }
 
-.entry-form .button.play {
+form .button.play {
   width: 16px;
   background-image: url('images/play.png');
 }
 
-.entry-form .button.pause {
-  margin-left: 14px;
+form .button.pause {
+  margin-left: 11px;
   width: 10px;
   background-image: url('images/pause.png');
+}
+
+a.link {
+  display: block;
+  margin-top: 10px;
+  font-size: 90%;
+  color: #555;
 }

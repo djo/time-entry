@@ -9,7 +9,7 @@
   };
 
   var form = {
-    self:    document.querySelector('.entry-form'),
+    self:    document.querySelector('form'),
     task:    document.querySelector('input.task'),
     time:    document.querySelector('input.time'),
     history: document.querySelector('textarea.history')
@@ -110,7 +110,7 @@
     if (hours > 0) formatted = hours + 'h' + formatted;
 
     // put it into the history
-    var entry = formatted + " ~ " + form.task.value;
+    var entry = form.task.value + " ~ " + formatted;
     form.history.value = entry + '\n' + form.history.value;
     storeHistory();
   };
