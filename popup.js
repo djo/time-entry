@@ -101,12 +101,19 @@
 
     // parse duration string into 1h15m format
     var time = form.time.value.split(':');
-    if (time.length === 2) time.unshift('0');
+    if (time.length === 2) time.push('0');
     var hours = Number(time[0]),
         mins  = Number(time[1]),
         secs  = Number(time[2]);
-    if (secs > 0) mins += 1;
-    var formatted = mins + 'm';
+    if (secs > 0) {
+      mins += 1;
+    }
+    if (mins > 59) {
+      mins = 0;
+      hours += 1;
+    }
+    var formatted = '';
+    if (mins > 0) formatted = mins + 'm';
     if (hours > 0) formatted = hours + 'h' + formatted;
 
     // put it into the history
