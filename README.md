@@ -1,6 +1,14 @@
 ## Time Tracking Extension for Chrome Web Store
 
-coming soon…
+The extension allows you to track time in the simplest way you can ever find(;
+
+![Screenshot](https://raw.github.com/Djo/time-entry/master/screen.png)
+
+Features:
+
+* Start/pause/resume/stop timer.
+* The timer doesn't depend on the browser session.
+* Tracking history is stored in the [localStorage](http://diveintohtml5.info/storage.html).
 
 Development:
 
